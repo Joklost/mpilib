@@ -1,3 +1,9 @@
 [submodule "libs/spdlog"]
 	path = libs/spdlog
 	url = git@github.com:gabime/spdlog.git
+[submodule "libs/geo"]
+	path = libs/geo
+	url = git@github.com:Joklost/geo.git
+[submodule "libs/common"]
+	path = libs/common
+	url = git@github.com:Joklost/common.git
