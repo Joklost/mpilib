@@ -3,6 +3,8 @@ set(CMAKE_CXX_STANDARD 14)
 
 project(mpilib LANGUAGES C CXX VERSION 1.0)
 
+add_subdirectory(libs)
+
 add_library(mpilib src/mpi.cpp src/hardware.cpp src/ostr.cpp src/helpers.cpp src/hwglobals.cpp src/node.cpp)
 set_target_properties(mpilib PROPERTIES LINKER_LANGUAGE CXX)
 
