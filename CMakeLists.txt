@@ -24,7 +24,3 @@ install(TARGETS mpilib EXPORT MPILibLibraryConfig
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 target_link_libraries(mpilib spdlog mpich geo common)
-
-enable_testing()
-
-add_subdirectory(test)
