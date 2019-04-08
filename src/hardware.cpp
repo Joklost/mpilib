@@ -71,29 +71,29 @@ std::chrono::microseconds hardware::broadcast(std::vector<octet> data) {
     return duration;
 }
 
-std::vector<std::vector<octet>> hardware::listen(std::chrono::microseconds duration) {
+std::vector<octet> hardware::listen(std::chrono::microseconds duration) {
     if (!hardware::initialized) {
-        return std::vector<std::vector<octet>>();
+        return std::vector<octet>();
     }
 
     hardware::prepare_localtime(duration);
     hardware::logger->debug("listen(localtime={}, duration={})", hardware::localtime - duration, duration);
-
-    std::vector<std::vector<octet>> packets{};
 
     /* Let the ctrlr know that we want to listen for a number of time slots. */
     mpi::send((hardware::localtime - duration).count(), CTRLR, RX_PKT);
     mpi::send(duration.count(), CTRLR, RX_PKT_DURATION);
 
     /* Wait for ctrlr to respond with number of packets. */
-    auto packet_count = mpi::recv<unsigned long>(CTRLR, RX_PKT_COUNT);
-    for (auto i = 0; i < packet_count; ++i) {
-        auto buffer = mpi::recv<std::vector<octet>>(CTRLR, RX_PKT_DATA);
-        packets.emplace_back(buffer);
+    auto end_time = std::chrono::microseconds{mpi::recv<unsigned long>(CTRLR, RX_PKT_END)};
+    auto packet = mpi::recv<std::vector<octet>>(CTRLR, RX_PKT_DATA);
+
+    if (end_time != 0us) {
+        /* We received a packet earlier than expected. */
+        hardware::localtime = end_time;
     }
 
     hardware::clock = hardware::now();
-    return packets;
+    return packet;
 }
 
 void hardware::sleep(std::chrono::microseconds duration) {
@@ -104,8 +104,8 @@ void hardware::sleep(std::chrono::microseconds duration) {
     hardware::prepare_localtime(duration);
     hardware::logger->debug("sleep(localtime={}, duration={})", hardware::localtime - duration, duration);
 
-    mpi::send(static_cast<unsigned long>(hardware::localtime.count()), CTRLR, NOOP);
-    mpi::send(static_cast<unsigned long>(duration.count()), CTRLR, NOOP_DURATION);
+    mpi::send(static_cast<unsigned long>(hardware::localtime.count()), CTRLR, SLEEP);
+    mpi::send(static_cast<unsigned long>(duration.count()), CTRLR, SLEEP_DURATION);
 
     hardware::clock = hardware::now();
 }
@@ -117,8 +117,7 @@ void hardware::report_localtime() {
 
     hardware::prepare_localtime(0us);
     hardware::logger->debug("report_localtime(localtime={})", hardware::localtime);
-    mpi::send(static_cast<unsigned long>(hardware::localtime.count()), CTRLR, NOOP);
-    mpi::send(static_cast<unsigned long>(0ul), CTRLR, NOOP_DURATION);
+    mpi::send(static_cast<unsigned long>(hardware::localtime.count()), CTRLR, INFORM);
 
     hardware::clock = hardware::now();
 }

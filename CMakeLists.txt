@@ -5,7 +5,7 @@ project(mpilib LANGUAGES C CXX VERSION 1.0)
 
 add_subdirectory(libs)
 
-add_library(mpilib
+add_library(mpilib OBJECT
         $<TARGET_OBJECTS:geo>
         $<TARGET_OBJECTS:common>
         src/mpi.cpp

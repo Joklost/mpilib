@@ -83,7 +83,7 @@ namespace hardware {
      * @param duration Amount of microseconds to listen for.
      * @return std::vector, containing std::vectors of data.
      */
-    std::vector<std::vector<octet>> listen(std::chrono::microseconds duration);
+    std::vector<octet> listen(std::chrono::microseconds duration);
 
     /**
      * Sleep for the given duration.

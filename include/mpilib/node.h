@@ -9,8 +9,9 @@ namespace mpilib {
     public:
         int rank{};
         geo::Location loc{};
-        unsigned long localtime{};
+
         bool dead{};
+        unsigned long action_count{};
 
         bool operator==(const Node &rhs) const;
 

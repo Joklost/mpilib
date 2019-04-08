@@ -14,15 +14,17 @@
 
 #define RX_PKT 2
 #define RX_PKT_DURATION 22
-#define RX_PKT_COUNT 222
+#define RX_PKT_END 222
 #define RX_PKT_DATA 2222
 
-#define NOOP 3
-#define NOOP_DURATION 33
+#define SLEEP 3
+#define SLEEP_DURATION 33
 
-#define SET_LOCATION 4
-#define UPDATE_LOCATION 44
-#define UPDATE_LOCATION_DATA 444
+#define INFORM 4
+
+#define SET_LOCATION 5
+#define UPDATE_LOCATION 55
+#define UPDATE_LOCATION_DATA 555
 
 #define NODE_INFO 7
 
