@@ -1,7 +1,6 @@
 #include <mpilib/hardware.h>
 
-
-void hardware::init(const geo::Location &loc, bool handshake, bool debug) {
+void hardware::init(bool debug) {
     if (hardware::initialized) {
         return;
     }
@@ -10,9 +9,18 @@ void hardware::init(const geo::Location &loc, bool handshake, bool debug) {
 
     int name_len{};
     char name[MPI_MAX_PROCESSOR_NAME];
-    mpi::init(&hardware::world_size, &hardware::world_rank, &name_len, name);
-    hardware::processor_name = mpilib::processor_name(name, hardware::world_rank);
+    int size{};
+    int rank{};
+    mpi::init(&size, &rank, &name_len, name);
 
+    if (size <= 2) {
+        mpi::deinit();
+        throw std::runtime_error("node count too low, unable to run simulation");
+    }
+
+    hardware::processor_name = mpilib::processor_name(name, hardware::world_rank);
+    hardware::world_size = size - 1;
+    hardware::world_rank = rank;
     hardware::logger = spdlog::stdout_color_mt(hardware::processor_name);
     if (debug) {
         hardware::logger->set_level(spdlog::level::debug);
@@ -20,25 +28,15 @@ void hardware::init(const geo::Location &loc, bool handshake, bool debug) {
 
     hardware::logger->debug("init()");
 
-    /* Subtract ctrlr from world size. */
-    hardware::world_size = hardware::world_size - 1;
-
-    if (handshake) {
-        hardware::handshake(loc);
-    }
-}
-
-void hardware::handshake(const geo::Location &loc) {
     /* Handshake */
-    auto magic = mpi::recv<int>(CTRLR, HANDSHAKE);
-    if (mpi::send(magic, CTRLR, HANDSHAKE) == MPI_SUCCESS) {
-        hardware::set_location(loc);
-
-        mpi::recv<int>(CTRLR, READY);
+    hardware::id = mpi::recv<unsigned long>(CTRLR, HANDSHAKE);
+    if (mpi::send(hardware::world_rank, CTRLR, HANDSHAKE) == MPI_SUCCESS) {
+        /* Wait for ready signal from Coordinator. */
+        mpi::recv<unsigned long>(CTRLR, READY);
         hardware::clock = hardware::now();
         hardware::localtime = 0us;
     } else {
-        hardware::deinit();
+        mpi::deinit();
         return;
     }
 }
@@ -55,7 +53,7 @@ void hardware::deinit() {
     hardware::initialized = false;
 }
 
-std::chrono::microseconds hardware::broadcast(std::vector<octet> data) {
+std::chrono::microseconds hardware::broadcast(const std::vector<octet> &data) {
     if (!hardware::initialized) {
         return 0us;
     }
@@ -122,24 +120,20 @@ void hardware::report_localtime() {
     hardware::clock = hardware::now();
 }
 
-
-bool hardware::set_location(const geo::Location &loc) {
-    if (!hardware::initialized) {
-        return false;
-    }
-
-    hardware::logger->debug("set_location(loc={})", loc);
-
-    auto buffer = mpilib::serialise<geo::Location>(loc);
-    return mpi::send(buffer, CTRLR, SET_LOCATION) == MPI_SUCCESS;
-}
-
 unsigned long hardware::get_id() {
     if (!hardware::initialized) {
         return 0;
     }
 
-    return static_cast<unsigned long>(hardware::world_rank);
+    return hardware::id;
+}
+
+unsigned long hardware::get_world_rank() {
+    if (!hardware::initialized) {
+        return 0;
+    }
+
+    return hardware::world_rank;
 }
 
 unsigned long hardware::get_world_size() {
@@ -147,7 +141,7 @@ unsigned long hardware::get_world_size() {
         return 0;
     }
 
-    return static_cast<unsigned long>(hardware::world_size);
+    return hardware::world_size;
 }
 
 std::chrono::time_point<std::chrono::high_resolution_clock> hardware::now() {

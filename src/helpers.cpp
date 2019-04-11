@@ -1,6 +1,6 @@
-#include <mpilib/helpers.h>
 #include <cmath>
 
+#include <mpilib/helpers.h>
 
 std::string mpilib::processor_name(const char *processor_name, int world_rank) {
     auto sid = std::string(4 - std::to_string(world_rank).length(), '0') + std::to_string(world_rank);

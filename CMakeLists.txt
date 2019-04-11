@@ -6,7 +6,6 @@ project(mpilib LANGUAGES C CXX VERSION 1.0)
 add_subdirectory(libs)
 
 add_library(mpilib OBJECT
-        $<TARGET_OBJECTS:geo>
         $<TARGET_OBJECTS:common>
         src/mpi.cpp
         src/hardware.cpp
@@ -32,4 +31,4 @@ install(TARGETS mpilib EXPORT MPILibLibraryConfig
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})  # This is for Windows
 install(DIRECTORY include DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-target_link_libraries(mpilib spdlog mpich geo common)
+target_link_libraries(mpilib spdlog mpich common)

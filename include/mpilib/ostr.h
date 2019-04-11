@@ -7,7 +7,7 @@
 #include <chrono>
 #include <mpilib/defines.h>
 
-std::ostream &operator<<(std::ostream &os, std::vector<octet> buffer);
+std::ostream &operator<<(std::ostream &os, const std::vector<octet>& buffer);
 
 std::ostream &operator<<(std::ostream &os, std::vector<octet> *buffer);
 

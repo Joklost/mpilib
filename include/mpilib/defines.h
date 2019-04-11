@@ -22,15 +22,6 @@
 
 #define INFORM 4
 
-#define SET_LOCATION 5
-#define UPDATE_LOCATION 55
-#define UPDATE_LOCATION_DATA 555
-
-#define NODE_INFO 7
-
-#define LINK_MODEL 8
-#define LINK_MODEL_LINK 88
-
 #define HANDSHAKE 10
 #define READY 110
 #define DIE 101

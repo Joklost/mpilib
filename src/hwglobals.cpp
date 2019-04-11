@@ -7,6 +7,7 @@ std::chrono::microseconds hardware::localtime{};
 
 std::shared_ptr<spdlog::logger> hardware::logger = nullptr;
 bool hardware::initialized{};
-int hardware::world_size{};
-int hardware::world_rank{};
+unsigned long hardware::id{};
+unsigned long hardware::world_size{};
+unsigned long hardware::world_rank{};
 std::string hardware::processor_name{};

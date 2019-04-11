@@ -29,9 +29,7 @@ namespace hardware {
      * @param loc The initial geolocation of this node.
      * @param debug Enable debug logging.
      */
-    void init(const geo::Location &loc, bool handshake = true, bool debug = false);
-
-    void handshake(const geo::Location &loc);
+    void init(bool debug = false);
 
     /**
      * Deinitialise the hardware interface.
@@ -43,6 +41,12 @@ namespace hardware {
      * @return unsigned long, identifier.
      */
     unsigned long get_id();
+
+    /**
+     * Get the rank assigned to this node by the MPI.
+     * @return unsigned long, rank assigned by MPI.
+     */
+    unsigned long get_world_rank();
 
     /**
      * Get the size of the known world (the amount of nodes).
@@ -57,13 +61,6 @@ namespace hardware {
     std::chrono::microseconds get_localtime();
 
     /**
-     * Set the geolocation of this node.
-     * @param loc The new geolocation.
-     * @return bool, true if successfull.
-     */
-    bool set_location(const geo::Location &loc);
-
-    /**
      * Report the local time of this node to the controller.
      *
      * This can be called as an alternative to #broadcast, #listen, or #sleep,
@@ -76,7 +73,7 @@ namespace hardware {
      * @param data std::vector containing data to broadcast.
      * @return std::chrono::microseconds, amount of microseconds broadcast took.
      */
-    std::chrono::microseconds broadcast(std::vector<octet> data);
+    std::chrono::microseconds broadcast(const std::vector<octet>& data);
 
     /**
      * Listen for packets for the given duration.
