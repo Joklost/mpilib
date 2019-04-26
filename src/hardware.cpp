@@ -18,9 +18,9 @@ void hardware::init(bool debug) {
         throw std::runtime_error("node count too low, unable to run simulation");
     }
 
-    hardware::processor_name = mpilib::processor_name(name, hardware::world_rank);
     hardware::world_size = size - 1;
     hardware::world_rank = rank;
+    hardware::processor_name = mpilib::processor_name(name, hardware::world_rank);
     hardware::logger = spdlog::stdout_color_mt(hardware::processor_name);
     if (debug) {
         hardware::logger->set_level(spdlog::level::debug);
@@ -58,6 +58,10 @@ std::chrono::microseconds hardware::broadcast(const std::vector<octet> &data) {
         return 0us;
     }
 
+    if (data.empty()) {
+        return 0us;
+    }
+
     auto duration = mpilib::compute_transmission_time(BAUDRATE, data.size());
     hardware::prepare_localtime(duration);
     hardware::logger->debug("broadcast(octets={}, localtime={}, duration={})",
@@ -71,7 +75,11 @@ std::chrono::microseconds hardware::broadcast(const std::vector<octet> &data) {
 
 std::vector<octet> hardware::listen(std::chrono::microseconds duration) {
     if (!hardware::initialized) {
-        return std::vector<octet>();
+        return std::vector<octet>{};
+    }
+
+    if (duration < 0us) {
+        return std::vector<octet>{};
     }
 
     hardware::prepare_localtime(duration);
@@ -96,6 +104,10 @@ std::vector<octet> hardware::listen(std::chrono::microseconds duration) {
 
 void hardware::sleep(std::chrono::microseconds duration) {
     if (!hardware::initialized) {
+        return;
+    }
+
+    if (duration < 0us) {
         return;
     }
 
@@ -149,6 +161,10 @@ std::chrono::time_point<std::chrono::high_resolution_clock> hardware::now() {
 }
 
 void hardware::prepare_localtime(std::chrono::microseconds duration) {
+    if (duration < 0us) {
+        return;
+    }
+
     /* Add execution time since last action to our localtime. */
     auto now = hardware::now();
     hardware::localtime = std::chrono::duration_cast<std::chrono::microseconds>(
