@@ -24,6 +24,8 @@ void hardware::init(bool debug) {
     hardware::logger = spdlog::stdout_color_mt(hardware::processor_name);
     if (debug) {
         hardware::logger->set_level(spdlog::level::debug);
+    } else {
+        hardware::logger->set_pattern("%v");
     }
 
     hardware::logger->debug("init()");
