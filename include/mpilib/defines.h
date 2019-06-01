@@ -27,7 +27,7 @@
 #define DIE 101
 
 /* Using declarations */
+using soctet = signed char;
 using octet = unsigned char;
-
 
 #endif /* MANETSIMS_DEFINES_H */

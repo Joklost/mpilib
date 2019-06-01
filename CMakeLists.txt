@@ -11,7 +11,8 @@ add_library(mpilib OBJECT
         src/hardware.cpp
         src/ostr.cpp
         src/helpers.cpp
-        src/hwglobals.cpp)
+        src/hwglobals.cpp
+        src/interface.cpp)
 
 set_target_properties(mpilib PROPERTIES LINKER_LANGUAGE CXX)
 

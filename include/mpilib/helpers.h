@@ -45,6 +45,17 @@ namespace mpilib {
      * @return Time transmission will take, in microseconds
      */
     std::chrono::microseconds compute_transmission_time(unsigned long baudrate, unsigned long octets);
+
+    template<class...Durations, class DurationIn>
+    std::tuple<Durations...> break_down_durations(DurationIn d) {
+        std::tuple<Durations...> retval;
+        using discard=int[];
+        (void) discard{0, (void(((std::get<Durations>(retval) = std::chrono::duration_cast<Durations>(
+                d)), (d -= std::chrono::duration_cast<DurationIn>(std::get<Durations>(retval))))), 0)...};
+        return retval;
+    }
+
+    std::string format_duration(std::chrono::microseconds us);
 }
 
 #endif /* MANETSIMS_HELPERS_H */

@@ -61,32 +61,24 @@ namespace hardware {
     std::chrono::microseconds get_localtime();
 
     /**
-     * Report the local time of this node to the controller.
-     *
-     * This can be called as an alternative to #broadcast, #listen, or #sleep,
-     * if none is applicable.
-     */
-    void report_localtime();
-
-    /**
      * Broadcast a blob of data.
      * @param data std::vector containing data to broadcast.
      * @return std::chrono::microseconds, amount of microseconds broadcast took.
      */
-    std::chrono::microseconds broadcast(const std::vector<octet>& data);
+    void transmit(const std::vector<octet> &data);
 
     /**
      * Listen for packets for the given duration.
      * @param duration Amount of microseconds to listen for.
      * @return std::vector, containing std::vectors of data.
      */
-    std::vector<octet> listen(std::chrono::microseconds duration);
+    std::vector<octet> receive(std::chrono::microseconds duration);
 
     /**
      * Sleep for the given duration.
      * @param duration Amount of microseconds to sleep for.
      */
-    void sleep(std::chrono::microseconds duration);
+    void noop(std::chrono::microseconds duration);
 }
 
 #endif /* MANETSIMS_HW_H */
