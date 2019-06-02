@@ -5,8 +5,7 @@ project(mpilib LANGUAGES C CXX VERSION 1.0)
 
 add_subdirectory(libs)
 
-add_library(mpilib OBJECT
-        $<TARGET_OBJECTS:common>
+add_library(mpilib STATIC
         src/mpi.cpp
         src/hardware.cpp
         src/ostr.cpp
