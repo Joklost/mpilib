@@ -74,7 +74,7 @@ void hardware::transmit(const std::vector<octet> &data) {
     hardware::clock = hardware::now();
 }
 
-std::vector<octet> hardware::receive(std::chrono::microseconds duration) {
+std::vector<octet> hardware::listen(std::chrono::microseconds duration) {
     if (!hardware::initialized) {
         return std::vector<octet>{};
     }
@@ -84,7 +84,7 @@ std::vector<octet> hardware::receive(std::chrono::microseconds duration) {
     }
 
     hardware::prepare_localtime(duration);
-    hardware::logger->debug("receive(localtime={}, duration={})", hardware::localtime - duration, duration);
+    hardware::logger->debug("listen(localtime={}, duration={})", hardware::localtime - duration, duration);
 
     /* Let the ctrlr know that we want to listen for a number of time slots. */
     mpi::send((hardware::localtime - duration).count(), CTRLR, RX_PKT);

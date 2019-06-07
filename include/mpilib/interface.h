@@ -6,7 +6,7 @@
 namespace hardware {
     void broadcast(const std::vector<octet> &data);
 
-    std::vector<octet> listen(std::chrono::microseconds duration);
+    std::vector<octet> receive(std::chrono::microseconds duration);
 
     void sleep(std::chrono::microseconds duration);
 

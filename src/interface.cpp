@@ -19,16 +19,16 @@ void hardware::broadcast(const std::vector<octet> &data) {
     hardware::transmit(data);
 }
 
-std::vector<octet> hardware::listen(std::chrono::microseconds duration) {
+std::vector<octet> hardware::receive(std::chrono::microseconds duration) {
     /* Two-phase listen. */
     if (duration == 0us) {
         return std::vector<octet>();
     }
 
     /* Phase 1: Receive header. */
-    hardware::logger->debug("listen(phase=1)");
+    hardware::logger->debug("receive(phase=1)");
     octet data_size = 0;
-    auto header = hardware::receive(duration);
+    auto header = hardware::listen(duration);
     if (header.size() == 2 && header[0] == 0x42) {
         data_size = header[1];
     } else {
@@ -36,8 +36,8 @@ std::vector<octet> hardware::listen(std::chrono::microseconds duration) {
     }
 
     /* Phase 2: Receive data. */
-    hardware::logger->debug("listen(phase=2)");
-    auto data = hardware::receive(mpilib::compute_transmission_time(BAUDRATE, data_size) + 20ms);
+    hardware::logger->debug("receive(phase=2)");
+    auto data = hardware::listen(mpilib::compute_transmission_time(BAUDRATE, data_size) + 20ms);
     return data;
 }
 
